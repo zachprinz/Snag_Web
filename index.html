@@ -7,46 +7,123 @@
     <script type="text/javascript" src="User.js"></script>
     <script type="text/javascript" src="Hook.js"></script>
     <script type="text/javascript" src="Board.js"></script>
+	<script type="text/javascript" src="Wall.js"></script>
 
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-        #readme{
-            margin-top: 10px;
-        }
-    </style>
+<style>
+body
+{
+    color: #777;
+    font-family: "Avenir", Verdana, sans-serif;
+}
+#readme
+{
+    margin-top: 10px;
+}
+</style>
 </head>
 <body>
 <div id="game">
-    <script type="text/javascript">
+	<script type="text/javascript">
 
-        this.game = new Phaser.Game(700, 400, Phaser.CANVAS, '', { preload: preload, create: create, update: update, render: render});
-        this.user;
-        this.board;
+		this.game = new Phaser.Game(700, 400, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update, render: render});
+		this.user;
+		this.board;
 
-        function preload() {
-            this.board = new Board(this.game);
-            this.board.preload();
-            this.user = new User(this.game,this.board);
-            this.user.preload();
-        }
+		function preload() {
+			this.board = new Board(this.game);
+			this.board.preload();
+			this.user = new User(this.game,this.board);
+			this.user.preload();
+		}
 
-        function create(){
-            this.board.create();
-            this.user.create();
-        }
+		function create(){
+			this.board.create();
+			this.user.create();
+		}
 
-        function update() {
-            this.board.update();
-            this.user.update();
-        }
+		function update() {
+			this.board.update();
+			this.user.update();
+		}
 
-        function render(){
+		function render(){
+			//this.game.debug.renderPhysicsBody(this.user.sprite.body);
+			//this.game.debug.renderPhysicsBody(this.board.groundSprite.body);
+			//this.game.debug.renderPhysicsBody(this.board.leftWall.sprite.body);
+			//this.game.debug.renderPhysicsBody(this.board.rightWall.sprite.body);
+			if(this.user.isHooked)
+				this.game.debug.renderLine(this.user.line);
+		}
 
-        }
+	</script>
+</div>
+<div id="readme">
+<h2>Snag</h2>
+	<ul>
 
-    </script>
+	<li><strong>High Concept:</strong>
+	You control a circle, use the space bar to snag on to nearby hooks and throw yourself around your world.
+	</li>
+
+	<li><strong>Player Experience Goals:</strong>
+	I want the player to have a relaxing experience and enjoy playing around with the physics of the game.
+	</li>
+
+	<li><strong>Genre:</strong>
+	This game would fit in the arcade genre similar to games like Super Hexagon, or The Impossible Game.
+	</li>
+
+	<li><strong>Game Play:</strong>
+	The user can use the space bar to at first snag onto nearby hooks and then release from them.
+	This can be done repeatedly to launch the users avatar around 3 central hooks. In the future it may be interesting to allow
+	user to climb upward to score points using this mechanic. Allowing your ball avatar to come into contact with the ground
+	or one of the walls will result in the game restarting you and your score being reset.
+	</li>
+	
+	<li><strong>Setting/Story:</strong>
+	The game is abstract, it is what the players make of it.
+	</li>
+
+	<li><strong>Prototype goal:</strong>
+	This prototype is/was originally intended to evaluate the Law of Conservation of Angular Momentum in games.
+	</li>
+
+	<li><strong>Target Audience:</strong>
+	The target audience for this game is casual gamers who are easily entertained.
+	</li>
+
+	<li><strong>Play time:</strong>
+	Not long.
+	</li>
+
+	<li><strong>Strategies:</strong>
+	It is important to accurately assess the space between your ball avatar and the nearest hook.
+	</li>
+
+	<li><strong>Assets:</strong>
+	All assets, audio, sprites, and otherwise were created from scratch.
+	</li>
+	
+	<li><strong>Estimated Schedule:</strong>
+	Should be able to implement/polish anything sudgested here (or within reason) within reason in 10-40 hours.
+	</li>
+
+	<li><strong>Closest Phaser Example:</strong>
+	None, I haven't looked at any phaser examples.
+	</li>
+	
+	<li><strong>Capabilities:</strong>
+		Simple Art (as in shapes and color themes) However I think my art style ends up looking fairly proffesional.
+		Programing (I would like to think I'm pretty good at this.)
+	</li>
+	
+	<li><strong>Lacking:</strong>
+		Complex Art
+		Sound Design
+		I really don't like polishing things, I kind of get bored once the fun stuff is done.
+	</li>
+
+	</ul>
 </div>
 </body>
 </html>
