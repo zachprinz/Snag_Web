@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Snag!</title>
+    <script type="text/javascript" src="phaser-1.1.6.min.js"></script>
+    <script type="text/javascript" src="User.js"></script>
+    <script type="text/javascript" src="Hook.js"></script>
+    <script type="text/javascript" src="Board.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+        #readme{
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="game">
+    <script type="text/javascript">
+
+        this.game = new Phaser.Game(700, 400, Phaser.CANVAS, '', { preload: preload, create: create, update: update, render: render});
+        this.user;
+        this.board;
+
+        function preload() {
+            this.board = new Board(this.game);
+            this.board.preload();
+            this.user = new User(this.game,this.board);
+            this.user.preload();
+        }
+
+        function create(){
+            this.board.create();
+            this.user.create();
+        }
+
+        function update() {
+            this.board.update();
+            this.user.update();
+        }
+
+        function render(){
+
+        }
+
+    </script>
+</div>
+</body>
+</html>
