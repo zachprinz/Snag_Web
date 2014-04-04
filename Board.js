@@ -12,7 +12,7 @@ Board = function(game){
     this.numberOfHooks = 0;
 	this.userPosition = 0;
 	this.userPositionY = 0;
-	this.boardScale = 1.4;
+	this.boardScale = 1.4 ;
 	this.userScore = 0;
 }
 

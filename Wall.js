@@ -31,8 +31,6 @@ Wall.prototype = {
 	scale: function(newScale){
 		var distanceToCenter = this.xWorldPosition - this.board.userPosition;
 		var newDistanceToCenter = distanceToCenter / newScale;
-		//var distanceToGround = 400 - this.yWorldPosition;
-		//var newDistanceToGround = distanceToGround / newScale;
 		this.sprite.x = 350 + newDistanceToCenter;
 		this.sprite.y = 0;
 		this.sprite.scale.setTo(1/newScale,1);

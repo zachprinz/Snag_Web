@@ -27,7 +27,7 @@ Hook.prototype = {
 		this.yScreenPosition = this.sprite.y;
     },
 	scale: function(newScale){
-		var distanceToCenter = this.xWorldPosition - this.board.userPosition;
+        var distanceToCenter = this.xWorldPosition - this.board.userPosition;
 		var newDistanceToCenter = distanceToCenter / newScale;
 		var distanceToGround = 400 - this.yWorldPosition;
 		var newDistanceToGround = distanceToGround / newScale;

@@ -26,6 +26,7 @@ User = function(game,board){
 	this.canMove = true;
 	this.line = null;
 	this.closestPos = 0;
+    this.canDrawLine = false;
 };
 
 User.prototype = {
@@ -91,6 +92,7 @@ User.prototype = {
     	this.setPositionToNewArmAngle();
     	console.log("Moving HOoked");
 		this.line.fromSprite(this.sprite,this.board.hooks[this.closestPos].sprite);
+        this.canDrawLine = true;
     },
     moveUnhooked: function(){
     	this.yVelocity -= this.gravity * this.board.elapsedTime;
@@ -133,6 +135,7 @@ User.prototype = {
     	console.log("Hook Arm Angle: " + this.hookArmAngle + " Hook Arm Radius: " + this.hookArmRadius + " Angular Velocity: " + this.angularVelocity + " Release Angle: " + releaseAngle + " Release X Velocity: " + this.xVelocity + " Release Y Velocity: " + this.yVelocity);
 		if(!this.jumpSound.isPlaying)
             this.jumpSound.play();
+        this.canDrawLine = false;
 	},
     findAngularVelocity: function(){
     	var tempX = ((0.5 * Math.sin(this.hookArmAngle / 57.29)+0.5) * this.xVelocity);
