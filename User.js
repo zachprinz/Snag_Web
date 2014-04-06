@@ -4,7 +4,6 @@
 
 User = function(game,board){
 	this.xOrigin = 0;
-	this.yOrigin = 0;
 	this.xVelocity = 50;
 	this.yVelocity = 40;
 	this.gravity = 9.8;
@@ -13,12 +12,9 @@ User = function(game,board){
     this.game = game;
     this.board = board;
     this.sprite = null;
-    this.cursors = null;
     this.isKeyDown = false;
     this.closestPositionX = 0;
     this.closestPositionY = 0;
-    this.xScreenPosition = 0;
-    this.yScreenPosition = 0;
 	this.xWorldPosition;
 	this.yWorldPosition;
     this.hookArmRadius = 0;
@@ -101,10 +97,10 @@ User.prototype = {
     },
     setWorldPosition: function(x,y){
     	this.sprite.x = 350 - 32;
-		this.xScreenPosition = 350 - 32;
+		//this.xScreenPosition = 350 - 32;
 		this.yWorldPosition = y;
 		this.sprite.y = 400 - ((400 - this.yWorldPosition) / this.board.boardScale);
-		this.yScreenPosition = this.sprite.y;
+		//this.yScreenPosition = this.sprite.y;
 		this.board.userPosition = x + this.xOrigin;
 		this.board.userPositionY = this.sprite.y;
 		this.xWorldPosition = x;
@@ -175,7 +171,7 @@ User.prototype = {
     },
     getDistance: function(x1,y1,x2,y2){
     	var deltaX = x2 - x1;
-    	var deltaY = y2 = y1;
+    	var deltaY = y1;
     	return Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
     },
     setPositionToNewArmAngle: function(){
@@ -186,7 +182,6 @@ User.prototype = {
     reset: function(){
         this.setWorldPosition(0,150);
     	this.xOrigin = 0;
-    	this.yOrigin = 0;
     	this.xVelocity = 50;
     	this.yVelocity = 40;
     	this.isHooked = false;
@@ -195,8 +190,6 @@ User.prototype = {
         this.closestPositionY = 0;
         this.xWorldPosition = 0;
         this.yWorldPosition = 0;
-		this.xScreenPosition = 0;
-		this.yScreenPosition = 0;
         this.hookArmRadius = 0;
         this.hookArmAngle = 0;
 		this.canMove = true;

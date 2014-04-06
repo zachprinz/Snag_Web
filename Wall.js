@@ -5,11 +5,6 @@ Wall = function(game,board){
     this.game = game;
     this.board = board;
     this.sprite = null;
-    this.xScreenPosition = 0;
-    this.yScreenPosition = 0;
-	this.xWorldPosition;
-	this.yWorldPosition;
-	this.currentScale = 1;
 };
 
 Wall.prototype = {
@@ -24,9 +19,7 @@ Wall.prototype = {
     	this.yWorldPosition = this.sprite.y;
     },
     update: function(){
-    	//this.sprite.x = 350 + this.xWorldPosition - this.board.userPosition;
-		this.xScreenPosition = this.sprite.x;
-		this.yScreenPosition = this.board.userPositionY - 500;
+
     },
 	scale: function(newScale){
 		var distanceToCenter = this.xWorldPosition - this.board.userPosition;

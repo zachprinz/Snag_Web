@@ -4,14 +4,12 @@
 
 Board = function(game){
     this.game = game;
-    this.frameTime = 0;
     this.previousTime = 0;
     this.hooks = [];
 	this.leftWall = null;
 	this.rightWall = null;
     this.numberOfHooks = 0;
 	this.userPosition = 0;
-	this.userPositionY = 0;
 	this.boardScale = 1.4 ;
 	this.userScore = 0;
 }
@@ -66,12 +64,6 @@ Board.prototype = {
 		this.rightWall.scale(this.boardScale);
 		this.leftWall.update();
 		this.rightWall.update();
-    },
-    updateBlocks: function(){
-    	
-    },
-    move: function(){
-
     },
 	scale: function(newScale){
 		this.groundSprite.scale.setTo(1,1/newScale);
