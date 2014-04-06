@@ -5,6 +5,7 @@ Wall = function(game,board){
     this.game = game;
     this.board = board;
     this.sprite = null;
+    this.worldPosition = new Vec2(0,0);
 };
 
 Wall.prototype = {
@@ -15,14 +16,14 @@ Wall.prototype = {
     	this.sprite = game.add.sprite(x,y,'wall');
 		this.sprite.body.collideWorldBounds = false;
 		this.sprite.body.immovable = true;
-    	this.xWorldPosition = this.sprite.x;
-    	this.yWorldPosition = this.sprite.y;
+    	this.worldPosition.x = this.sprite.x;
+    	this.worldPosition.y = this.sprite.y;
     },
-    update: function(){
-
+    update: function(newScale){
+        this.scale(newScale);
     },
 	scale: function(newScale){
-		var distanceToCenter = this.xWorldPosition - this.board.userPosition;
+		var distanceToCenter = this.worldPosition.x - this.board.userPosition;
 		var newDistanceToCenter = distanceToCenter / newScale;
 		this.sprite.x = 350 + newDistanceToCenter;
 		this.sprite.y = 0;

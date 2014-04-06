@@ -5,26 +5,22 @@ Hook = function(game,board){
     this.game = game;
     this.board = board;
     this.sprite = null;
-	this.xWorldPosition;
-	this.yWorldPosition;
+    this.worldPosition = new Vec2(0,0);
 };
 
 Hook.prototype = {
-    preload: function(){
-    	
-    },
     create: function(x,y){
     	this.sprite = game.add.sprite(x,y,'hook');
-    	this.xWorldPosition = this.sprite.x;
-    	this.yWorldPosition = this.sprite.y;
+    	this.worldPosition.x = this.sprite.x;
+    	this.worldPosition.y = this.sprite.y;
     },
-    update: function(){
-
+    update: function(newScale){
+        this.scale(newScale);
     },
 	scale: function(newScale){
-        var distanceToCenter = this.xWorldPosition - this.board.userPosition;
+        var distanceToCenter = this.worldPosition.x - this.board.userPosition;
 		var newDistanceToCenter = distanceToCenter / newScale;
-		var distanceToGround = 400 - this.yWorldPosition;
+		var distanceToGround = 400 - this.worldPosition.y;
 		var newDistanceToGround = distanceToGround / newScale;
 		this.sprite.x = 350 + newDistanceToCenter;
 		this.sprite.y = 400 - newDistanceToGround;

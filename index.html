@@ -8,8 +8,8 @@
     <script type="text/javascript" src="Hook.js"></script>
     <script type="text/javascript" src="Board.js"></script>
 	<script type="text/javascript" src="Wall.js"></script>
-
-<style>
+    <script type="text/javascript" src="Vec2.js"></script>
+    <style>
 body
 {
     color: #777;
@@ -47,10 +47,6 @@ body
 		}
 
 		function render(){
-			//this.game.debug.renderPhysicsBody(this.user.sprite.body);
-			//this.game.debug.renderPhysicsBody(this.board.groundSprite.body);
-			//this.game.debug.renderPhysicsBody(this.board.leftWall.sprite.body);
-			//this.game.debug.renderPhysicsBody(this.board.rightWall.sprite.body);
 			if(this.user.isHooked && this.user.canDrawLine)
 				this.game.debug.renderLine(this.user.line);
 		}
