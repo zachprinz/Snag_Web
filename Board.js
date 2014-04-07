@@ -1,28 +1,17 @@
 Board = function(game){
+    this.preloadImages = ['background','blank','hook','wall','user','ground','score'];
+    this.preloadSFX = ['point','jump','die','hit'];
+    this.numberOfHooks = this.numberOfWalls = this.userPosition = this.userScore = this.previousTime = 0;
+    this.boardScale = 1.4;
     this.game = game;
-    this.previousTime = 0;
     this.hooks = [];
     this.walls = [];
-    this.numberOfHooks = 0;
-    this.numberOfWalls = 0;
-	this.userPosition = 0;
-	this.boardScale = 1.4 ;
-	this.userScore = 0;
 }
 
 Board.prototype = {
     preload: function(){
-        this.game.load.image('background','images/board.png');
-        this.game.load.image('blank','images/blank.png');
-    	this.game.load.image('hook','images/hook.png');
-		this.game.load.image('wall','images/wall.png');
-        this.game.load.image('user','images/user.png');
-        this.game.load.audio('point','sfx/point.wav');
-        this.game.load.audio('jump','sfx/jump.wav');
-        this.game.load.audio('die','sfx/die.wav');
-        this.game.load.audio('hit','sfx/hit.wav');
-    	this.game.load.image('ground','images/ground.png');
-		this.game.load.image('score','images/score.png');
+        this.preloadImages.forEach(function(x){game.load.image(x,'images/' + x + ".png")});
+        this.preloadSFX.forEach(function(x){game.load.audio(x,'sfx/' + x + '.wav')});
     },
     create: function(){
         this.sprite = game.add.sprite(0,0,'background');
@@ -31,13 +20,11 @@ Board.prototype = {
 		this.groundSprite.body.immovable = true;
         this.previousTime = (this.game.time.time / 100);
         for(var x = 0; x < 3; x++){ //Can instantiate from XML later.
-            this.hooks[x] = new Hook(this.game,this);
-            this.hooks[x].create(300 + (x*600),100);
+            this.hooks[x] = new Hook(this.game,this,300 + (x*600),100);
             this.numberOfHooks++;
         }
         for(var x = 0; x < 2; x++){ //Can instantiate from XML later.
-            this.walls[x] = new Wall(this.game,this);
-            this.walls[x].create(-300 + (x*2100),0);
+            this.walls[x] = new Wall(this.game,this,-300 + (x*2100),0);
             this.numberOfWalls++;
         }
 		this.scoreSprite = game.add.sprite(0,12,'score');

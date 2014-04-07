@@ -3,27 +3,19 @@ User = function(game,board){
     this.game = game;
     this.closestPosition = new Vec2(0,0);
     this.worldPosition = new Vec2(0,0);
-    this.velocity = new Vec2(50,40);
+    this.velocity = new Vec2(50,60);
     this.origin = new Vec2(0,0);
-    this.isKeyDown = false;
-    this.isHooked = false;
-    this.sprite = null;
-    this.line = null;
-    this.angularVelocity = 0;
-    this.hookArmRadius = 0;
-    this.hookArmAngle = 0;
-	this.closestPos = 0;
+    this.angularVelocity = this.hookArmRadius = this.hookArmAngle = 0;
+    this.isKeyDown = this.isHooked = false;
     this.gravity = 9.8;
-    this.sfx = [];
+    this.sfx = []
 };
 
 User.prototype = {
     create: function(){
         this.sprite = game.add.sprite(0,-32,'user');
-        this.cursors = this.game.input.keyboard.createCursorKeys();
         this.sprite.body.bounce.setTo(0.00000001, 0.00000001);
         this.sprite.body.collideWorldBounds = false;
-		this.sprite.body.allowGravity = false;
 		this.sprite.body.immovable = false;
         this.setWorldPosition(0,150);
 		this.line = new Phaser.Line();
@@ -44,31 +36,24 @@ User.prototype = {
     checkInput: function(){
         if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && !this.isKeyDown){
         	this.isKeyDown = true;
-        	if(!this.isHooked)
-        		this.snag();
-        	else
-        		this.release();
+            this.isHooked ? this.release() : this.snag();
         }
         else if(!game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.isKeyDown)
     		this.isKeyDown = false;
     },
     move: function(){
-        if(this.isHooked)
-            this.moveHooked();
-        else
-            this.moveUnhooked();
+        this.isHooked ? this.moveHooked() : this.moveUnhooked();
     },
     moveHooked: function(){
         this.hookArmAngle = this.hookArmAngle % 360;
-        var aAForG = (Math.cos(this.hookArmAngle / 57.29) * this.gravity);
-		this.angularVelocity -= aAForG * this.board.elapsedTime;
+        var angularAccelerationFromGravity = (Math.cos(this.hookArmAngle / 57.29) * this.gravity);
+		this.angularVelocity -= angularAccelerationFromGravity * this.board.elapsedTime;
     	this.hookArmAngle += (this.angularVelocity * this.board.elapsedTime);
     	this.setPositionToNewArmAngle();
-        this.line.fromSprite(this.sprite,this.board.hooks[this.closestPos].sprite);
     },
     moveUnhooked: function(){
     	this.velocity.y -= this.gravity * this.board.elapsedTime;
-    	this.moveBy(this.velocity.x * this.board.elapsedTime, this.velocity.y * this.board.elapsedTime);
+        this.setWorldPosition(this.worldPosition.x + (this.velocity.x * this.board.elapsedTime),this.worldPosition.y - (this.velocity.y * this.board.elapsedTime));
     },
     setWorldPosition: function(x,y){
         this.worldPosition.set(x,y);
@@ -76,22 +61,14 @@ User.prototype = {
 		this.sprite.y = 400 - ((400 - y) / this.board.boardScale);
         this.board.userPosition = x + this.origin.x;
     },
-    moveBy: function(xMove,yMove){
-    	this.setWorldPosition(this.worldPosition.x + xMove,this.worldPosition.y - yMove);
-    },
     snag: function(){
-    	console.log("Snagging");
     	this.findClosestHook();
     	this.findAngularVelocity();
     	this.isHooked = true;
-		this.line.renderable = true;
 		this.board.userScore++;
         this.playSFX('hit');
-        this.line.fromSprite(this.sprite,this.board.hooks[this.closestPos].sprite);
     },
     release: function(){
-		this.line.renderable = false;
-    	console.log("Releasing");
     	this.isHooked = false;
     	var totalVelocity = Math.abs(this.hookArmRadius * this.angularVelocity)/50;
     	var sign = this.angularVelocity > 0 ? 1 : this.angularVelocity == 0 ? 0 : -1;
@@ -106,27 +83,15 @@ User.prototype = {
     	this.velocity.setToVec2(tempVelocity);
     },
     findClosestHook: function(){
-    	var shortestDistance = 9999;
+        var closestHookPos = 0;
     	for(var x = 0; x < this.board.numberOfHooks; x++){
-            var tempDistance = this.board.hooks[x].worldPosition.getDistance(this.worldPosition);
-    		if(tempDistance < shortestDistance){
-    			shortestDistance = tempDistance;
-    			this.closestPosition.set(this.board.hooks[x].worldPosition.x,this.board.hooks[x].worldPosition.y);
-    			this.hookArmRadius = tempDistance;
-    			this.hookArmAngle = Math.atan((this.board.hooks[x].worldPosition.y - this.worldPosition.y)/(this.worldPosition.x - this.board.hooks[x].worldPosition.x)) * 57.29;
-				this.closestPos = x;
-    		}
+    		if(this.worldPosition.getDistance(this.board.hooks[x].worldPosition) < this.worldPosition.getDistance(this.board.hooks[closestHookPos].worldPosition))
+                closestHookPos = x;
     	}
-		if(this.hookArmAngle > 0){ //This is horrible code I know...
-			if(this.worldPosition.x - this.closestPosition.x < 0)
-				this.hookArmAngle += 180;
-		}
-		else{
-			if(this.worldPosition.x - this.closestPosition.x > 0)
-				this.hookArmAngle += 360;
-			else
-				this.hookArmAngle += 180;
-		}
+        this.closestPosition.set(this.board.hooks[closestHookPos].worldPosition.x,this.board.hooks[closestHookPos].worldPosition.y);
+        this.hookArmRadius = this.worldPosition.getDistance(this.board.hooks[closestHookPos].worldPosition);
+        this.hookArmAngle = Math.atan((this.board.hooks[closestHookPos].worldPosition.y - this.worldPosition.y)/(this.worldPosition.x - this.board.hooks[closestHookPos].worldPosition.x)) * 57.29;
+        (this.worldPosition.x - this.closestPosition.x > 0) ? this.hookArmAngle += 360 : this.hookArmAngle += 180;
     },
     setPositionToNewArmAngle: function(){
     	var tempX = (Math.cos(this.hookArmAngle / 57.29) * this.hookArmRadius) + this.closestPosition.x;
@@ -136,9 +101,10 @@ User.prototype = {
     reset: function(){
         this.setWorldPosition(20,100);
         this.playSFX('die');
-        this.velocity.set(50,40);
+        this.velocity.set(50,60);
         this.board.userScore = 0;
         this.isHooked = false;
+        this.board.boardScale = 1.4;
     },
 	checkCollisions: function(){
 		this.game.physics.collide(this.sprite,this.board.groundSprite,this.collisionHandler,null,this);

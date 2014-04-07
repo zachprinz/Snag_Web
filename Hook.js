@@ -1,15 +1,15 @@
-Hook = function(game,board){
+Hook = function(game,board,x,y){
     this.game = game;
     this.board = board;
     this.sprite = null;
     this.worldPosition = new Vec2(0,0);
+    this.create(x,y);
 };
 
 Hook.prototype = {
     create: function(x,y){
     	this.sprite = game.add.sprite(x,y,'hook');
-    	this.worldPosition.x = this.sprite.x;
-    	this.worldPosition.y = this.sprite.y;
+    	this.worldPosition.set(this.sprite.x, this.sprite.y);
     },
     update: function(newScale){
         this.scale(newScale);
