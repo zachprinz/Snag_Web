@@ -1,7 +1,3 @@
-/**
- * Created by Zachary on 3/1/14.
- */
-
 Board = function(game){
     this.game = game;
     this.previousTime = 0;
@@ -16,12 +12,17 @@ Board = function(game){
 
 Board.prototype = {
     preload: function(){
-        game.load.image('background','images/board.png');
-        game.load.image('blank','images/blank.png');
+        this.game.load.image('background','images/board.png');
+        this.game.load.image('blank','images/blank.png');
     	this.game.load.image('hook','images/hook.png');
 		this.game.load.image('wall','images/wall.png');
-    	game.load.image('ground','images/ground.png');
-		game.load.image('score','images/score.png');
+        this.game.load.image('user','images/user.png');
+        this.game.load.audio('point','sfx/point.wav');
+        this.game.load.audio('jump','sfx/jump.wav');
+        this.game.load.audio('die','sfx/die.wav');
+        this.game.load.audio('hit','sfx/hit.wav');
+    	this.game.load.image('ground','images/ground.png');
+		this.game.load.image('score','images/score.png');
     },
     create: function(){
         this.sprite = game.add.sprite(0,0,'background');
@@ -29,21 +30,16 @@ Board.prototype = {
 		this.groundSprite.body.collideWorldBounds = false;
 		this.groundSprite.body.immovable = true;
         this.previousTime = (this.game.time.time / 100);
-
-        //Can instantiate this from XML later.
-        this.hooks[0] = new Hook(this.game,this);
-        this.hooks[0].create(300,100);
-		this.hooks[1] = new Hook(this.game,this);
-        this.hooks[1].create(900,100);
-		this.hooks[2] = new Hook(this.game,this);
-        this.hooks[2].create(1500,100);
-        this.numberOfHooks = 3;
-        this.walls[0] = new Wall(this.game,this);
-        this.walls[1] = new Wall(this.game,this);
-        this.walls[0].create(-300,0);
-        this.walls[1].create(1800,0);
-        this.numberOfWalls = 2;
-
+        for(var x = 0; x < 3; x++){ //Can instantiate from XML later.
+            this.hooks[x] = new Hook(this.game,this);
+            this.hooks[x].create(300 + (x*600),100);
+            this.numberOfHooks++;
+        }
+        for(var x = 0; x < 2; x++){ //Can instantiate from XML later.
+            this.walls[x] = new Wall(this.game,this);
+            this.walls[x].create(-300 + (x*2100),0);
+            this.numberOfWalls++;
+        }
 		this.scoreSprite = game.add.sprite(0,12,'score');
 		this.scoreLabelString = "0";
 		this.style = {font: "30px Arial",fill: "#dad6cb", align: "left"};
@@ -51,22 +47,19 @@ Board.prototype = {
 
     },
     update: function(){
-	    if(this.scoreLabelString != this.userScore){
-            this.scoreLabelString = this.userScore;
-            this.score.setText(this.userScore);
-        }
+        this.score.setText(this.userScore);
         this.elapsedTime = (this.game.time.time / 100) - this.previousTime;
-        this.previousTime = (this.game.time.time / 100);
+        this.previousTime = (this.game.time.time / 100); //Too bad game.time.elapsed is deprecated.
 		this.scale(this.boardScale);
-		for(var x  = 0; x < this.numberOfHooks; x++){
-			this.hooks[x].update(this.boardScale);
-		}
+    },
+	scale: function(newScale){
+        for(var x  = 0; x < this.numberOfHooks; x++){
+            this.hooks[x].update(this.boardScale);
+        }
         for(var x  = 0; x < this.numberOfWalls; x++){
             this.walls[x].update(this.boardScale);
         }
-    },
-	scale: function(newScale){
-		this.groundSprite.scale.setTo(1,1/newScale);
-		this.groundSprite.y = 400 - (50/newScale);
+        this.groundSprite.scale.setTo(1,1/newScale);
+        this.groundSprite.y = 400 - (50/newScale);
 	}
 }

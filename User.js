@@ -1,35 +1,23 @@
-/**
- * Created by Zachary on 3/1/14.
- */
-
 User = function(game,board){
-    this.game = game;
     this.board = board;
-    this.origin = new Vec2(0,0);
-    this.velocity = new Vec2(50,40);
+    this.game = game;
     this.closestPosition = new Vec2(0,0);
     this.worldPosition = new Vec2(0,0);
-	this.gravity = 9.8;
-	this.isHooked = false;
-	this.angularVelocity = 0;
-    this.sprite = null;
+    this.velocity = new Vec2(50,40);
+    this.origin = new Vec2(0,0);
     this.isKeyDown = false;
+    this.isHooked = false;
+    this.sprite = null;
+    this.line = null;
+    this.angularVelocity = 0;
     this.hookArmRadius = 0;
     this.hookArmAngle = 0;
-	this.canMove = true;
-	this.line = null;
 	this.closestPos = 0;
-    this.canDrawLine = false;
+    this.gravity = 9.8;
+    this.sfx = [];
 };
 
 User.prototype = {
-    preload: function(){
-        this.game.load.image('user','images/user.png');
-		this.game.load.audio('die','sfx/die.wav');
-        this.game.load.audio('jump','sfx/jump.wav');
-        this.game.load.audio('point','sfx/point.wav');
-        this.game.load.audio('hit','sfx/hit.wav');
-    },
     create: function(){
         this.sprite = game.add.sprite(0,-32,'user');
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -39,9 +27,9 @@ User.prototype = {
 		this.sprite.body.immovable = false;
         this.setWorldPosition(0,150);
 		this.line = new Phaser.Line();
-		this.dieSound = game.add.audio('die');
-        this.jumpSound = game.add.audio('jump');
-        this.hitSound = game.add.audio('hit');
+        this.sfx['die'] = game.add.audio('die');
+        this.sfx['jump'] = game.add.audio('jump');
+        this.sfx['hit'] = game.add.audio('hit');
     },
     update: function(){
 		if(this.sprite.y < 200)
@@ -58,46 +46,35 @@ User.prototype = {
         	this.isKeyDown = true;
         	if(!this.isHooked)
         		this.snag();
-        	else if(this.isHooked)
+        	else
         		this.release();
         }
         else if(!game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.isKeyDown)
     		this.isKeyDown = false;
     },
     move: function(){
-    	this.hookArmAngle = this.hookArmAngle % 360;
-		if(this.canMove){
-			if(this.worldPosition.y > 700)
-				this.reset();
-			if(this.isHooked)
-				this.moveHooked();
-			else
-				this.moveUnhooked();
-		}
-		else{
-			this.reset();
-		}
+        if(this.isHooked)
+            this.moveHooked();
+        else
+            this.moveUnhooked();
     },
     moveHooked: function(){
-    	var aAForG = (Math.cos(this.hookArmAngle / 57.29) * this.gravity);
+        this.hookArmAngle = this.hookArmAngle % 360;
+        var aAForG = (Math.cos(this.hookArmAngle / 57.29) * this.gravity);
 		this.angularVelocity -= aAForG * this.board.elapsedTime;
     	this.hookArmAngle += (this.angularVelocity * this.board.elapsedTime);
     	this.setPositionToNewArmAngle();
-		this.line.fromSprite(this.sprite,this.board.hooks[this.closestPos].sprite);
-        this.canDrawLine = true;
+        this.line.fromSprite(this.sprite,this.board.hooks[this.closestPos].sprite);
     },
     moveUnhooked: function(){
     	this.velocity.y -= this.gravity * this.board.elapsedTime;
     	this.moveBy(this.velocity.x * this.board.elapsedTime, this.velocity.y * this.board.elapsedTime);
     },
     setWorldPosition: function(x,y){
-    	this.sprite.x = 350 - 32;
-		this.worldPosition.y = y;
-		this.sprite.y = 400 - ((400 - this.worldPosition.y) / this.board.boardScale);
-		this.board.userPosition = x + this.origin.x;
-		this.board.userPositionY = this.sprite.y;
-		this.worldPosition.x = x;
-		console.log("User Y: " + this.worldPosition.y);
+        this.worldPosition.set(x,y);
+        this.sprite.x = 350 - 32; //The center
+		this.sprite.y = 400 - ((400 - y) / this.board.boardScale);
+        this.board.userPosition = x + this.origin.x;
     },
     moveBy: function(xMove,yMove){
     	this.setWorldPosition(this.worldPosition.x + xMove,this.worldPosition.y - yMove);
@@ -109,8 +86,8 @@ User.prototype = {
     	this.isHooked = true;
 		this.line.renderable = true;
 		this.board.userScore++;
-		if(!this.hitSound.isPlaying)
-			this.hitSound.play();
+        this.playSFX('hit');
+        this.line.fromSprite(this.sprite,this.board.hooks[this.closestPos].sprite);
     },
     release: function(){
 		this.line.renderable = false;
@@ -119,37 +96,27 @@ User.prototype = {
     	var totalVelocity = Math.abs(this.hookArmRadius * this.angularVelocity)/50;
     	var sign = this.angularVelocity > 0 ? 1 : this.angularVelocity == 0 ? 0 : -1;
     	var releaseAngle = this.hookArmAngle + (sign * 90);
-    	this.velocity.x = Math.cos(releaseAngle / 57.29) * totalVelocity;
-    	this.velocity.y = Math.sin(releaseAngle / 57.29) * totalVelocity;
-    	console.log("Hook Arm Angle: " + this.hookArmAngle + " Hook Arm Radius: " + this.hookArmRadius + " Angular Velocity: " + this.angularVelocity + " Release Angle: " + releaseAngle + " Release X Velocity: " + this.velocity.x + " Release Y Velocity: " + this.velocity.y);
-		if(!this.jumpSound.isPlaying)
-            this.jumpSound.play();
-        this.canDrawLine = false;
+    	this.velocity.set(Math.cos(releaseAngle / 57.29) * totalVelocity, this.velocity.y = Math.sin(releaseAngle / 57.29) * totalVelocity);
+        this.playSFX('jump');
 	},
     findAngularVelocity: function(){
-    	var tempX = ((0.5 * Math.sin(this.hookArmAngle / 57.29)+0.5) * this.velocity.x);
-    	var tempY = ((0.5 * Math.cos(this.hookArmAngle / 57.29)+0.5) * this.velocity.y);
-    	var tempTotal = Math.sqrt(Math.pow(tempX,2) + Math.pow(tempY,2));
-    	if(this.velocity.x == 0)
-    		this.velocity.x = 1;
-    	this.angularVelocity = (tempTotal / this.hookArmRadius) * (tempX / Math.abs(tempX));
-    	this.velocity.x = tempX;
-    	this.velocity.y = tempY;
+    	var tempVelocity = new Vec2((0.5 * Math.sin(this.hookArmAngle / 57.29)+0.5) * this.velocity.x,(0.5 * Math.cos(this.hookArmAngle / 57.29)+0.5) * this.velocity.y);
+    	var tempTotal = Math.sqrt(Math.pow(tempVelocity.x,2) + Math.pow(tempVelocity.y,2));
+    	this.angularVelocity = (tempTotal / this.hookArmRadius) * (tempVelocity.x / Math.abs(tempVelocity.x));
+    	this.velocity.setToVec2(tempVelocity);
     },
     findClosestHook: function(){
     	var shortestDistance = 9999;
     	for(var x = 0; x < this.board.numberOfHooks; x++){
-    		var tempDistance = this.getDistance(this.board.hooks[x].worldPosition.x,this.board.hooks[x].worldPosition.y,this.worldPosition.x,this.worldPosition.y);
+            var tempDistance = this.board.hooks[x].worldPosition.getDistance(this.worldPosition);
     		if(tempDistance < shortestDistance){
     			shortestDistance = tempDistance;
-    			this.closestPosition.x = this.board.hooks[x].worldPosition.x;
-    			this.closestPosition.y = this.board.hooks[x].worldPosition.y;
+    			this.closestPosition.set(this.board.hooks[x].worldPosition.x,this.board.hooks[x].worldPosition.y);
     			this.hookArmRadius = tempDistance;
     			this.hookArmAngle = Math.atan((this.board.hooks[x].worldPosition.y - this.worldPosition.y)/(this.worldPosition.x - this.board.hooks[x].worldPosition.x)) * 57.29;
 				this.closestPos = x;
     		}
     	}
-		console.log("Angle: " + this.hookArmAngle + " Radius: " + this.hookArmRadius);
 		if(this.hookArmAngle > 0){ //This is horrible code I know...
 			if(this.worldPosition.x - this.closestPosition.x < 0)
 				this.hookArmAngle += 180;
@@ -160,12 +127,6 @@ User.prototype = {
 			else
 				this.hookArmAngle += 180;
 		}
-		console.log("Angle: " + this.hookArmAngle + " Radius: " + this.hookArmRadius);
-    },
-    getDistance: function(x1,y1,x2,y2){
-    	var deltaX = x2 - x1;
-    	var deltaY = y2 -  y1;
-    	return Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
     },
     setPositionToNewArmAngle: function(){
     	var tempX = (Math.cos(this.hookArmAngle / 57.29) * this.hookArmRadius) + this.closestPosition.x;
@@ -173,19 +134,11 @@ User.prototype = {
     	this.setWorldPosition(tempX,tempY);
     },
     reset: function(){
-        this.setWorldPosition(20,150);
-        this.closestPosition.set(0,0);
-        this.worldPosition.set(0,0);
+        this.setWorldPosition(20,100);
+        this.playSFX('die');
         this.velocity.set(50,40);
-        this.origin.x = 0
+        this.board.userScore = 0;
         this.isHooked = false;
-        this.angularVelocity = 0;
-        this.hookArmRadius = 0;
-        this.hookArmAngle = 0;
-		this.canMove = true;
-		this.board.boardScale = 1.4;
-		this.board.userScore = 0;
-		this.dieSound.play();
     },
 	checkCollisions: function(){
 		this.game.physics.collide(this.sprite,this.board.groundSprite,this.collisionHandler,null,this);
@@ -194,7 +147,7 @@ User.prototype = {
         }
 	},
 	collisionHandler: function(){
-		this.canMove = false;
+        this.reset();
 	},
 	scale: function(newScale){
 		this.sprite.scale.setTo(1/newScale,1/newScale);
@@ -202,5 +155,9 @@ User.prototype = {
 		var distanceToGround = 400 - this.worldPosition.y;
 		var newDistanceToGround = distanceToGround / newScale;
 		this.sprite.y = 400 - newDistanceToGround;
-	}
+	},
+    playSFX: function(sfx){
+        if(!this.sfx[sfx].isPlaying)
+            this.sfx[sfx].play();
+    }
 }

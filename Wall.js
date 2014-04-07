@@ -1,6 +1,3 @@
-/**
- * Created by Zachary on 3/1/14.
- */
 Wall = function(game,board){
     this.game = game;
     this.board = board;
@@ -9,9 +6,6 @@ Wall = function(game,board){
 };
 
 Wall.prototype = {
-    preload: function(){
-    	
-    },
     create: function(x,y){
     	this.sprite = game.add.sprite(x,y,'wall');
 		this.sprite.body.collideWorldBounds = false;

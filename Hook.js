@@ -1,6 +1,3 @@
-/**
- * Created by Zachary on 3/1/14.
- */
 Hook = function(game,board){
     this.game = game;
     this.board = board;

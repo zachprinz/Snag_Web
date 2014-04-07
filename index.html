@@ -15,40 +15,32 @@ body
     color: #777;
     font-family: "Avenir", Verdana, sans-serif;
 }
-#readme
-{
-    margin-top: 10px;
-}
 </style>
 </head>
 <body>
 <div id="game">
 	<script type="text/javascript">
 
-		this.game = new Phaser.Game(700, 400, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update, render: render});
-		this.user;
-		this.board;
+		var game = new Phaser.Game(700, 400, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update, render: render});
+		var user;
+		var board;
 
 		function preload() {
-			this.board = new Board(this.game);
-			this.board.preload();
-			this.user = new User(this.game,this.board);
-			this.user.preload();
+			board = new Board(game);
+			board.preload();
+			user = new User(game,board);
 		}
-
 		function create(){
-            this.board.create();
-            this.user.create();
+            board.create();
+            user.create();
 		}
-
 		function update() {
-			this.board.update();
-			this.user.update();
+			board.update();
+			user.update();
 		}
-
 		function render(){
-			if(this.user.isHooked && this.user.canDrawLine)
-				this.game.debug.renderLine(this.user.line);
+			if(user.isHooked)
+				game.debug.renderLine(user.line);
 		}
 
 	</script>
